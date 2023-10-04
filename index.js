@@ -30,11 +30,11 @@ let persons = [
    }
   ]
 
-app.get('/persons', (req, res) => {
+app.get('/api/persons', (req, res) => {
   res.json(persons)
 })
 
-app.get('/info', (req,res) =>{
+app.get('/api/info', (req,res) =>{
   const time = new Date()
   const people = `Currently contains: ${persons.length} people`
   const resBody =  `<p>${people}</p>  <p>${time}</p>`
@@ -42,7 +42,7 @@ app.get('/info', (req,res) =>{
   res.send(resBody)
 })
 
-app.get('/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response) => {
   
   const id = Number(request.params.id)
   const person = persons.find(note => note.id === id)
@@ -54,7 +54,7 @@ app.get('/persons/:id', (request, response) => {
   }
 })
 
-app.delete('/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   console.log(""+persons.length)
   persons = persons.filter(note => note.id !== id)
@@ -66,7 +66,7 @@ const generateId = () => {
   return Math.floor(Math.random() * 10000);
 }
 
-app.post('/persons', (request, response) => {
+app.post('/api/persons', (request, response) => {
   const body = request.body
   console.log(body)
 
