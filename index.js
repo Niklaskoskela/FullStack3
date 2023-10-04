@@ -1,13 +1,14 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
+
+app.use(cors())
 app.use(express.json())
 
 var morgan = require('morgan')
-
 morgan.token('body', req => {
   return JSON.stringify(req.body)
 })
-
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let persons = [
@@ -69,18 +70,21 @@ app.post('/persons', (request, response) => {
   console.log(body)
 
   if (!body.name || body.name === "") {
+    console.log("no name")
     return response.status(400).json({ 
       error: 'name missing' 
     })
   }
 
   if (!body.number || body.number === "") {
+    console.log("no number")
     return response.status(400).json({ 
       error: 'number missing' 
     })
   }
 
-  if (persons.findIndex(person => person.name === body.name) === -1) {
+  if (persons.findIndex(person => person.name === body.name) != -1) {
+    console.log("not unique")
     return response.status(400).json({ 
       error: 'name not unique' 
     })
@@ -91,7 +95,7 @@ app.post('/persons', (request, response) => {
     number: body.number,
     id: generateId(),
   }
-
+  console.log("new person " + person.name)
   persons = persons.concat(person)
 
   response.json(person)
