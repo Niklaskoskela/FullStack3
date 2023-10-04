@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+app.use(express.json())
 
 let persons = [
    {
@@ -13,12 +14,12 @@ let persons = [
     number: '030-143457'
    },
    {
-    id: 2,
+    id: 3,
     name: 'Mauno K',
     number: '1'
    }
   ]
-  
+
 app.get('/persons', (req, res) => {
   res.json(persons)
 })
@@ -45,11 +46,48 @@ app.get('/persons/:id', (request, response) => {
 
 app.delete('/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  person = persons.filter(note => note.id !== id)
-
+  console.log(""+persons.length)
+  persons = persons.filter(note => note.id !== id)
+  console.log('-->' + persons.length)
   res.status(204).end()
 })
 
+const generateId = () => {
+  return Math.floor(Math.random() * 10000);
+}
+
+app.post('/persons', (request, response) => {
+  const body = request.body
+  console.log(body)
+
+  if (!body.name || body.name === "") {
+    return response.status(400).json({ 
+      error: 'name missing' 
+    })
+  }
+
+  if (!body.number || body.number === "") {
+    return response.status(400).json({ 
+      error: 'number missing' 
+    })
+  }
+
+  if (persons.findIndex(person => person.name === body.name) === -1) {
+    return response.status(400).json({ 
+      error: 'name not unique' 
+    })
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  }
+
+  persons = persons.concat(person)
+
+  response.json(person)
+})
   
 const PORT = 3001
 app.listen(PORT, () => {
