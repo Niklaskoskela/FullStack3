@@ -1,7 +1,10 @@
+//IMPORTS
 const express = require('express')
 const app = express()
 const cors = require('cors')
 
+
+//MIDDLEWARE
 app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json())
