@@ -9,40 +9,65 @@ app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json())
 
+//MORGAN
 var morgan = require('morgan')
 morgan.token('body', req => {
   return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let persons = [
-   {
-    id: 1,
-    name: 'Arto Hellas',
-    number: '040-123456'
-   },
-   {
-    id: 2,
-    name: 'Jaakkoppi',
-    number: '030-143457'
-   },
-   {
-    id: 3,
-    name: 'Mauno K',
-    number: '1'
-   }
-  ]
+//MONGOOSE
 
+const mongoose = require('mongoose')
+
+if (process.argv.length<3) {
+  console.log('give password as argument')
+  process.exit(1)
+}
+
+const password = process.argv[2]
+const url =
+`mongodb+srv://nk:${password}@cluster0.onekweo.mongodb.net/phonebook?retryWrites=true&w=majority`
+
+mongoose.set('strictQuery',false)
+mongoose.connect(url).then(result => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
+})
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+const Person = mongoose.model('Person', personSchema)
+
+
+
+  //SERER REQUESTS
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => {
+    res.json(persons)
+  }
+  )
 })
 
 app.get('/api/info', (req,res) =>{
-  const time = new Date()
-  const people = `Currently contains: ${persons.length} people`
-  const resBody =  `<p>${people}</p>  <p>${time}</p>`
-
-  res.send(resBody)
+  Person.find({}).then(persons => {
+    res.send(
+      `<p> Database has ${persons.length} people</p><p>${new Date()}</p>`
+    )
+  }
+  )
 })
 
 app.get('/api/persons/:id', (request, response) => {
