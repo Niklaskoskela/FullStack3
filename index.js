@@ -19,42 +19,42 @@ morgan.token('body', req => {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 
-
-
   //SERER REQUESTS
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
-    res.json(persons)
+    response.json(persons)
   }
   )
 })
 
-app.get('/api/info', (req,res) =>{
+app.get('/api/info', (request,response,next) =>{
   Person.find({}).then(persons => {
-    res.send(
+    response.send(
       `<p> Database has ${persons.length} people</p><p>${new Date()}</p>`
     )
   }
-  )
+  ).catch((error) => next(error));
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id).then(person => {
-    response.json(person)
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
   })
+  .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  console.log(""+persons.length)
-  persons = persons.filter(note => note.id !== id)
-  console.log('-->' + persons.length)
-  res.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+  
+  Person.findByIdAndRemove(request.params.id).then(result =>{
+    response.status(204).end()
+  }
+  ).catch((error) => next(error));
 })
 
-const generateId = () => {
-  return Math.floor(Math.random() * 10000);
-}
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
@@ -83,6 +83,21 @@ app.post('/api/persons', (request, response) => {
   newPerson.save().then(saved => {
     response.json(saved)
   })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
 })
 
 const PORT = process.env.PORT || 3001
