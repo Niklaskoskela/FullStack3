@@ -61,8 +61,8 @@ const App = () => {
           setPersons(persons.map(person =>
             person.id !== id ? person : changedPerson))
         }).catch(error => {
-          console.log(error)
-          setStatusMessage(`${changedPerson} was already deleted`)
+          console.log(error.response.data)
+          setStatusMessage(error.response.data.error)
           setStatusStyle("error")
           setTimeout(() => {
             setStatusMessage(null)
@@ -79,7 +79,8 @@ const App = () => {
   
     }
     else {
-      personService.create(newPerson)
+      personService
+        .create(newPerson)
         .then(response => {
           console.log("posted")
           setPersons(persons.concat(response.data))
@@ -90,8 +91,13 @@ const App = () => {
           setTimeout(() => {
             setStatusMessage(null)
           }, 5000)
-      }).catch(error => {
-        console.log(error)
+      })
+        .catch(error => {
+          console.log(error.response.data)
+          setStatusMessage(error.response.data.error)
+          setStatusStyle("error")
+          setTimeout(() => {
+            setStatusMessage(null)}, 5000)
     })
       
     } 
@@ -104,8 +110,8 @@ const App = () => {
           persons.filter(person => id != person.id)
         )
       ).catch(error => {
-        console.log(error)
-        setStatusMessage(`${id} was already deleted`)
+        console.log(error.response.data)
+        setStatusMessage(error.response.data.error)
         setStatusStyle("error")
         setTimeout(() => {
           setStatusMessage(null)
