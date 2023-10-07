@@ -1,7 +1,6 @@
 import "./index.css"
 
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import FilterForm from './components/FilterForm.jsx'
 import PersonForm from './components/PersonForm.jsx'
 import Person from './components/Person.jsx'
@@ -57,7 +56,7 @@ const App = () => {
       const changedPerson = { ...p, number: newNumber }
       
       personService.update(id,changedPerson).then(
-        returnedPerson => {
+        () => {
           setPersons(persons.map(person =>
             person.id !== id ? person : changedPerson))
         }).catch(error => {
