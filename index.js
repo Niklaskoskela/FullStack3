@@ -7,7 +7,7 @@ const Person = require('./models/person')
 
 
 //MIDDLEWARE
-app.use(express.static('dist'))
+app.use(express.static('build'))
 app.use(cors())
 app.use(express.json())
 
